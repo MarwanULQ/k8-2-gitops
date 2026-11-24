@@ -1,5 +1,5 @@
 image: ""
-replicaCount: 2
+replicaCount: 4
 
 configmap:
   data:
