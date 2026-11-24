@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "library.migrateName" . }}
+  labels:
+    {{- include "library.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 4
+  template:
+    metadata:
+      labels:
+        {{- include "library.labels" . | nindent 8 }}
+    spec:
+      restartPolicy: OnFailure
+      imagePullSecrets:
+        - name: ghcr-pull-secret
+      containers:
+        - name: migrate
+          image: {{ .Values.image | quote }}
+          command: ["sh", "-c", "flask --app wsgi db upgrade && flask --app wsgi seed-books"]
+          env:
+            - name: SECRET_KEY
+              valueFrom: {secretKeyRef: {name: {{ include "library.secretsName" . }}, key: SECRET_KEY}}
+            - name: POSTGRES_PASSWORD
+              valueFrom: {secretKeyRef: {name: {{ include "library.secretsName" . }}, key: POSTGRES_PASSWORD}}
+            - name: DATABASE_URL
+              value: postgresql+psycopg://library:$(POSTGRES_PASSWORD)@{{ include "library.postgresName" . }}:5432/library
