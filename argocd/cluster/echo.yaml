@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: echo
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/MarwanULQ/k8-2-gitops.git
+    targetRevision: main
+    path: apps/echo
+    helm:
+      releaseName: echo
+      valueFiles:
+        - ../../environments/cluster/echo.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: echo
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

@@ -1,0 +1,2 @@
+replicaCount: 1
+message: Hello from the cluster app of apps!
