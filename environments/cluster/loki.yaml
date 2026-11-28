@@ -1,9 +1,5 @@
 deploymentMode: SingleBinary
 loki:
-  service:
-    type: NodePort
-    nodePort: 30310
-
   auth_enabled: false
   commonConfig:
     replication_factor: 1
@@ -40,3 +36,7 @@ lokiCanary:
   enabled: false
 test:
   enabled: false
+gateway:
+  service:
+    type: NodePort
+    nodePort: 30310
